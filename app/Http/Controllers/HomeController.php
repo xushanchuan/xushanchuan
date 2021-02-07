@@ -74,6 +74,7 @@ class HomeController extends Controller
 
     public function upload(Request $request)
     {
+        
         //上传到filesystems文件中设置的public驱动，下的avatars文件夹下，并返回路径：avatars/aU5pJbn4nLn5lgLcFDbY11hFuHuLrFTr5hmS6KGP.png
         $path = $request->file('avatar')->store('avatars','public');
         return $path;
