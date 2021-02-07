@@ -1,0 +1,1 @@
+当用redis存储cache时，使用的是redis的1号库

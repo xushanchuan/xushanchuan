@@ -46,11 +46,8 @@ class MyTest extends Command
         $this->info('密码：'.$password);
         $this->error('Something went wrong!');
         $this->line('Display this on the screen');
-
         $headers = ['名称', '描述'];
-
         $users = Activity::all(['name', 'description'])->toArray();
-
         $this->table($headers, $users);
 
         return '';

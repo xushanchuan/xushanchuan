@@ -21,3 +21,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('activity/{id}',[HomeController::class, 'index']);
 Route::post('activity',[HomeController::class, 'addActivity']);
+Route::post('cache',[HomeController::class, 'cacheAdd']);
+Route::get('cache',[HomeController::class, 'cacheGet']);
+Route::get('config',[HomeController::class, 'getConfig']);
+Route::get('storage',[HomeController::class, 'storage']);
+Route::post('upload',[HomeController::class, 'upload']);
