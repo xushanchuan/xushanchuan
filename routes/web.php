@@ -14,5 +14,5 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return 'xushanchuan1';
+    return '徐山川个人网站';
 });
