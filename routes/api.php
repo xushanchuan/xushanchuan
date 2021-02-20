@@ -26,3 +26,4 @@ Route::get('cache',[HomeController::class, 'cacheGet']);
 Route::get('config',[HomeController::class, 'getConfig']);
 Route::get('storage',[HomeController::class, 'storage']);
 Route::post('upload',[HomeController::class, 'upload']);
+Route::get('redisLockTest',[HomeController::class, 'redisLockTest']);

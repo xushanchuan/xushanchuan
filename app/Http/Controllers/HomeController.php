@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 
 
 use App\Models\Config;
+use App\Models\SendRecords;
 use App\Service\ActivityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Storage;
 
 class HomeController extends Controller
@@ -66,6 +69,40 @@ class HomeController extends Controller
         }
     }
 
+    public function mysqlLock(Request $request)
+    {
+        $mobile    = $request->input('mobile', '13711111111');
+        DB::transaction(function ()use($mobile){
+            $model = SendRecords::query()->where('mobile',$mobile)->where('created_at','>',date('Y-m-d H:i:s', time() - 60))->lockForUpdate()->first();
+            if ($model){
+                throw new \Exception('一分钟后重试');
+            }
+            $code = mt_rand(1000,9999);
+            SendRecords::query()->create([
+                'mobile' => $mobile,
+                'code' => $code,
+            ]);
+        });
+    }
+
+    public function redisLockTest(Request $request)
+    {
+        $mobile    = $request->input('mobile', '13711111111');
+        $existKey = "serve:mobile:{$mobile}";
+//        Redis::command('set', [$existKey, "ok", 60]);
+
+        $script = <<<SCRIPT
+return redis.call('SET', KEYS[1], ARGV[1], 'NX', 'EX', ARGV[2])
+SCRIPT;
+        $res = Redis::eval($script, 1,$existKey, 2, 60);//数字1代表键名参数的数量，$existKey是键名参数
+
+
+        if (!$res){
+            return ['data' => [], 'msg' => '请稍后重试'];
+        }
+        return ['msg'=>'ok'];
+    }
+
     public function storage()
     {
         Storage::put('test.txt','11111');
@@ -74,7 +111,6 @@ class HomeController extends Controller
 
     public function upload(Request $request)
     {
-        
         //上传到filesystems文件中设置的public驱动，下的avatars文件夹下，并返回路径：avatars/aU5pJbn4nLn5lgLcFDbY11hFuHuLrFTr5hmS6KGP.png
         $path = $request->file('avatar')->store('avatars','public');
         return $path;
